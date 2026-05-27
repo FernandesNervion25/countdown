@@ -1,1 +1,42 @@
+name: Genera y envía stories diarias
 
+on:
+  schedule:
+    # 14:50 hora española (CEST = UTC+2 en verano)
+    - cron: '50 12 * * 1-5'
+  workflow_dispatch: # permite lanzarlo manualmente desde GitHub
+
+jobs:
+  generar-stories:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Instalar wkhtmltopdf y fuentes
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y wkhtmltopdf fonts-lora
+          # Instalar Poppins manualmente
+          mkdir -p ~/.local/share/fonts
+          wget -q https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf -O ~/.local/share/fonts/Poppins-Regular.ttf
+          wget -q https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf    -O ~/.local/share/fonts/Poppins-Bold.ttf
+          wget -q https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Light.ttf   -O ~/.local/share/fonts/Poppins-Light.ttf
+          wget -q https://github.com/google/fonts/raw/main/ofl/lora/Lora%5Bwght%5D.ttf    -O ~/.local/share/fonts/Lora-Variable.ttf
+          fc-cache -f
+
+      - name: Generar stories
+        run: bash generar_stories.sh
+
+      - name: Enviar por Telegram
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: |
+          for img in stories/story_1_fin.png stories/story_2_eval.png stories/story_3_clases.png; do
+            curl -s -X POST \
+              "https://api.telegram.org/bot${TG_TOKEN}/sendPhoto" \
+              -F chat_id="${TG_CHAT_ID}" \
+              -F photo="@${img}"
+          done
