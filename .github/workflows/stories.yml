@@ -2,9 +2,8 @@ name: Genera y envía stories diarias
 
 on:
   schedule:
-    # 14:50 hora española (CEST = UTC+2 en verano)
     - cron: '50 12 * * 1-5'
-  workflow_dispatch: # permite lanzarlo manualmente desde GitHub
+  workflow_dispatch:
 
 jobs:
   generar-stories:
@@ -17,13 +16,12 @@ jobs:
       - name: Instalar wkhtmltopdf y fuentes
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y wkhtmltopdf fonts-lora
-          # Instalar Poppins manualmente
+          sudo apt-get install -y wkhtmltopdf
           mkdir -p ~/.local/share/fonts
           wget -q https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf -O ~/.local/share/fonts/Poppins-Regular.ttf
           wget -q https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf    -O ~/.local/share/fonts/Poppins-Bold.ttf
           wget -q https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Light.ttf   -O ~/.local/share/fonts/Poppins-Light.ttf
-          wget -q https://github.com/google/fonts/raw/main/ofl/lora/Lora%5Bwght%5D.ttf    -O ~/.local/share/fonts/Lora-Variable.ttf
+          wget -q "https://github.com/google/fonts/raw/main/ofl/lora/Lora%5Bwght%5D.ttf"  -O ~/.local/share/fonts/Lora-Variable.ttf
           fc-cache -f
 
       - name: Generar stories
