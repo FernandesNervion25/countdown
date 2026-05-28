@@ -15,6 +15,8 @@ jobs:
 
       - name: Instalar wkhtmltopdf y fuentes
         run: |
+          sudo timedatectl set-timezone Europe/Madrid
+          echo "Hora actual: $(date)"
           sudo apt-get update -qq
           sudo apt-get install -y wkhtmltopdf
           mkdir -p ~/.local/share/fonts
